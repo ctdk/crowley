@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Jeremy Bingham (<jeremy@goiardi.gl>)
+ * Copyright (c) 2020-2025, Jeremy Bingham (<jeremy@goiardi.gl>)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/jessevdk/go-flags"
 	"log"
 	"os"
@@ -25,12 +26,13 @@ import (
 	"runtime"
 )
 
-const version = "0.0.1"
+const version = "0.0.2"
 
 type Options struct {
 	Version bool `short:"v" long:"version" description:"Print version info."`
-	RootPath string `short:"p" long:"path" description:"Root path to scan for linter errors and naughty coding practices."`
+	RootPath string `short:"p" long:"path" description:"Root path to scan for linter errors and naughty coding practices. Required."`
 	Verbose bool `short:"V" long:"verbose" description:"Verbose output."`
+	NoColor bool `short:"c" long:"no-color" description:"Disable colorized linter output."`
 }
 
 func main() {
@@ -52,6 +54,15 @@ func main() {
 		os.Exit(0)
 	}
 
+	if opts.RootPath == "" {
+		log.Println("No root path to check given. Exiting.")
+		os.Exit(1)
+	}
+
+	if opts.NoColor {
+		color.NoColor = true
+	}
+
 	pathInfo, err := os.Stat(opts.RootPath)
 	if err != nil {
 		log.Fatal(err)
@@ -65,10 +76,17 @@ func main() {
 	d := new(int)
 
 	walkErr := filepath.Walk(opts.RootPath, func(path string, info os.FileInfo, err error) error {
+		// skip .git though
+		if info.Name() == ".git" {
+			return filepath.SkipDir
+		}
 		if err != nil {
 			return err
 		}
 		if info.IsDir() {
+			if opts.Verbose {
+				fmt.Printf("Checking %s ...\n", path)
+			}
 			*d++ // another directory
 		} else {
 			*c++ // another file
@@ -80,9 +98,19 @@ func main() {
 	}
 
 	if opts.Verbose {
-		fmt.Printf("Scanned %d files, %d directories... No issues found.\n\n", *c, *d)
+		plurFile := "s"
+		plurDir := "ies"
+		if *c == 1 {
+			plurFile = ""
+		}
+		if *d == 1 {
+			plurDir = "y"
+		}
+		yellow := color.New(color.FgHiYellow)
+		yellow.Printf("\nScanned %d file%s, %d director%s... No issues found.\n\n", *c, plurFile, *d, plurDir)
 	}
 
-	fmt.Printf("\"Do What Thou Wilt\" shall be the Whole of the Law.\n")
+	red := color.New(color.FgHiRed)
+	red.Printf("\"Do What Thou Wilt\" shall be the Whole of the Law.\n")
 	os.Exit(0)
 }
