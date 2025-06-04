@@ -26,7 +26,7 @@ import (
 	"runtime"
 )
 
-const version = "0.0.2"
+const version = "0.1.0"
 
 type Options struct {
 	Version bool `short:"v" long:"version" description:"Print version info."`
