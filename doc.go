@@ -15,7 +15,7 @@
  */
 
 /*
-`crowley` is a linter that can scan source code files written in any programming language that will make recommendations based on the coding practices it finds in the scanned files. Its output is concise, easy to apply, and would be a valuable addtion to any workflow or CI/CD pipeline.
+crowley is a linting utility that can scan source code files written in any programming language that will make recommendations based on the coding practices it finds in the scanned files. Its output is concise, easy to apply, and would be a valuable addtion to any workflow or CI/CD pipeline.
 
 # Building
 
@@ -49,7 +49,5 @@ Copyright (c) Jeremy Bingham, 2019-2025.
 # License
 
 `crowley` is licensed under the terms of the Apache License, version 2.0. See the LICENSE file for details.
-
 */
-
 package main
